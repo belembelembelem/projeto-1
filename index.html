@@ -4,14 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>projeto 1</title>
+    <title>Projeto 1</title>
     <link rel="stylesheet" href="style.css">
+
+    <script src="p5_biblioteca/p5.js"></script>
+    <script src="p5_biblioteca/p5.sound.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <h1>Memoria Fragmentada</h1>
+    <h1>Memória Fragmentada</h1>
     <p>Reconstrói a imagem antes que a memória se perca.</p>
+
+    <div id="gameContainer"></div>
+
+    <div id="infoContainer">
+        <div id="cronometro">Tempo: 90s</div>
+        <div id="memorias">Memórias salvas: 0</div>
+        <button id="proximoPuzzle">Próximo Puzzle</button>
+    </div>
+
     <script src="sketch.js"></script>
 
 </body>
