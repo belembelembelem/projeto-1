@@ -50,3 +50,8 @@ button {
 button:hover {
     background-color: #ff8080;
 }
+
+#imagemReferencia {
+    max-width: 300px;
+    opacity: 0.8;
+}

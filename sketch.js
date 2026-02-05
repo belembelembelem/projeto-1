@@ -7,45 +7,42 @@ let colunas = 4
 let tamanhoPecaX, tamanhoPecaY
 let pecaArrastada = null
 
-let tempoTotal = 90
+let tempoTotal = 120
 let tempoInicio
 let tempoRestante
 let memoriasSalvas = 0
 let puzzleCompleto = false
 
+let puzzleFalhado = false
+
+let puzzlesDisponiveis = []
+
 let tempoCritico = 10
 let botaoProximo
+
+let maxLargura, maxAltura, escala, canvasAltura, canvasLargura, cnv
 
 function preload() {
     imagens.push(loadImage("data/img1.jpg"))
     imagens.push(loadImage("data/img2.jpg"))
     imagens.push(loadImage("data/img3.jpg"))
     imagens.push(loadImage("data/img4.jpg"))
+    imagens.push(loadImage("data/img5.jpg"))
+    imagens.push(loadImage("data/img6.jpg"))
+
+
 
 }
 
 function setup() {
-    imagemAtual = random(imagens)
 
-    let maxLargura = windowWidth * 0.9;
-    let maxAltura = windowHeight * 0.7;
-    let escala = min(maxLargura / imagemAtual.width, maxAltura / imagemAtual.height, 1)
-    let canvasLargura = imagemAtual.width * escala
-    let canvasAltura = imagemAtual.height * escala
+    puzzlesDisponiveis = [...imagens]
 
-    let cnv = createCanvas(canvasLargura, canvasAltura)
-    cnv.parent("gameContainer")
-
-    // Redimensionar imagem para caber no canvas
-    imagemAtual.resize(canvasLargura, canvasAltura)
-
-    tamanhoPecaX = imagemAtual.width / colunas
-    tamanhoPecaY = imagemAtual.height / linhas
+    criarPuzzle()
+    criarPecas()
 
     tempoInicio = millis()
     tempoRestante = tempoTotal
-
-    criarPecas()
 
     botaoProximo = select("#proximoPuzzle")
     botaoProximo.mousePressed(proximoPuzzle)
@@ -93,36 +90,101 @@ function draw() {
     select("#memorias").html(`Memórias salvas: ${memoriasSalvas}`)
 
 
+    if (puzzleFalhado) {
+        background(0, 200)
+
+        fill(255)
+        textAlign(CENTER, CENTER)
+        textSize(28)
+        text("Falhaste este puzzle.\nClica para tentar o próximo.", width / 2, height / 2)
+
+        return
+    }
+
     verificarPuzzleCompleto()
 
     // Se o tempo acabou
-    if (tempoRestante <= 0 && !puzzleCompleto) {
-        puzzleCompleto = true
-        for (let p of pecas) {
-            p.alpha = 50
-        }
+    if (tempoRestante <= 0 && !puzzleCompleto && !puzzleFalhado) {
+        puzzleFalhado = true
     }
+
 }
+
+
+
+function criarPuzzle() {
+    if (puzzlesDisponiveis.length === 0) {
+        return
+    }
+    // o splice é para remover da lista imagem ja passada 
+    let index = floor(random(puzzlesDisponiveis.length))
+    imagemAtual = puzzlesDisponiveis.splice(index, 1)[0]
+
+    // área fixa para todos os puzzles
+    canvasLargura = windowWidth * 0.6
+    canvasAltura = windowHeight * 0.6
+
+    escala = min(
+        canvasLargura / imagemAtual.width,
+        canvasAltura / imagemAtual.height
+    )
+
+    let novaLargura = imagemAtual.width * escala
+    let novaAltura = imagemAtual.height * escala
+
+    cnv = createCanvas(novaLargura, novaAltura)
+    cnv.parent("gameContainer")
+
+    imagemAtual.resize(novaLargura, novaAltura)
+
+    tamanhoPecaX = imagemAtual.width / colunas
+    tamanhoPecaY = imagemAtual.height / linhas
+
+    let imgRef = select("#imagemReferencia")
+    imgRef.attribute("src", imagemAtual.canvas.toDataURL())
+
+}
+
 
 function criarPecas() {
     pecas = [];
+
     for (let y = 0; y < linhas; y++) {
         for (let x = 0; x < colunas; x++) {
+
+            let px, py;
+
+            // garantir que a peça não nasce já no sítio correto
+            do {
+                px = random(0, width - tamanhoPecaX);
+                py = random(0, height - tamanhoPecaY);
+            } while (
+                dist(px, py, x * tamanhoPecaX, y * tamanhoPecaY) < 50
+            );
+
             pecas.push({
-                x: random(width - tamanhoPecaX),
-                y: random(height - tamanhoPecaY),
+                x: px,
+                y: py,
                 correctX: x * tamanhoPecaX,
                 correctY: y * tamanhoPecaY,
                 imgX: x * tamanhoPecaX,
                 imgY: y * tamanhoPecaY,
                 placed: false,
                 alpha: 255
-            })
+            });
         }
     }
 }
 
+
+
 function mousePressed() {
+
+    if (puzzleFalhado) {
+        proximoPuzzle()
+        return
+    }
+
     for (let i = pecas.length - 1; i >= 0; i--) {
         let p = pecas[i]
         if (
@@ -183,18 +245,22 @@ function verificarPuzzleCompleto() {
 }
 
 function proximoPuzzle() {
-    imagemAtual = random(imagens)
-    // Redimensionar para o canvas existente
-    imagemAtual.resize(width, height)
+    if (puzzlesDisponiveis.length === 0) {
+        background(0)
+        fill(255)
+        textAlign(CENTER, CENTER)
+        textSize(28)
+        text("Terminaste o jogo, vamos ver quantas memorias salvaste!", width / 2, height / 2)
+        noLoop()
+        return
+    }
 
-    tamanhoPecaX = imagemAtual.width / colunas
-    tamanhoPecaY = imagemAtual.height / linhas
-
+    criarPuzzle()
     criarPecas();
 
     tempoInicio = millis()
     tempoRestante = tempoTotal
     puzzleCompleto = false
+    puzzleFalhado = false
+
 }
-
-
