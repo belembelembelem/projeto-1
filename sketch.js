@@ -230,26 +230,30 @@ function finalizarJogo() {
     // Mostrar div do final
     document.getElementById("telaFinal").style.display = "block";
 
-    // Adicionar listener para botão 
     document.getElementById("verMemorias").onclick = () => mostrarMemorias();
 }
 
 function mostrarMemorias() {
-    const container = document.getElementById("conteudoMemorias");
-    container.innerHTML = `<h2>Memórias salvas: ${memoriasSalvas} / ${imagensFinal.length}</h2>`;
+    const container = document.getElementById("conteudoMemorias")
+    container.innerHTML = `<h2>Memórias salvas: ${memoriasSalvas} / ${imagensFinal.length}</h2>`
+
+    let mensagens = document.getElementsByClassName("msg-fim")
+    mensagens[0].style.display = "none"
+    mensagens[1].style.display = "none"
+
 
     for (let i = 0; i < imagensFinal.length; i++) {
-        let img = document.createElement("img");
-        img.src = imagensFinal[i].canvas.toDataURL();
-        img.style.maxWidth = "200px";
-        img.style.margin = "10px";
+        let img = document.createElement("img")
+        img.src = imagensFinal[i].canvas.toDataURL()
+        img.style.maxWidth = "200px"
+        img.style.margin = "10px"
 
-        let p = document.createElement("p");
-        p.textContent = i < memoriasSalvas ? "Completada" : "Falhada";
-        p.style.opacity = "0.8";
+        let p = document.createElement("p")
+        p.textContent = i < memoriasSalvas ? "Completada" : "Falhada"
+        p.style.opacity = "0.8"
 
-        container.appendChild(img);
-        container.appendChild(p);
+        container.appendChild(img)
+        container.appendChild(p)
     }
 
     // Adicionar escolha final
@@ -257,19 +261,67 @@ function mostrarMemorias() {
     escolhaP.textContent = "O que queres fazer com estas memórias?";
     container.appendChild(escolhaP);
 
-    const botoes = ["Rouba-las", "Doa-las", "Guardar"];
+    const botoes = ["Rouba-las para ti", "Doa-las a museus", "Tentar denovo"]
     botoes.forEach(op => {
-        let btn = document.createElement("button");
+        let btn = document.createElement("button")
         btn.textContent = op;
-        btn.onclick = () => escolha(op);
-        container.appendChild(btn);
+        btn.onclick = () => escolha(op)
+        container.appendChild(btn)
     });
 
     // esconder botão para não clicar de novo
-    document.getElementById("verMemorias").style.display = "none";
+    document.getElementById("verMemorias").style.display = "none"
 }
 
 function escolha(opcao) {
-    const container = document.getElementById("conteudoMemorias");
-    container.innerHTML = `<h2>Escolheste: ${opcao}</h2><p>Obrigado por participar.</p>`;
+    const container = document.getElementById("conteudoMemorias")
+
+    if (opcao === "Rouba-las para ti") {
+        container.innerHTML = `
+            <h2>Escolheste: Roubá-las!</h2>
+            <p>Guardaste as memórias só para ti, escondidas do resto do mundo.</p>
+        `
+    }
+    else if (opcao === "Doa-las a museus") {
+        container.innerHTML = `
+            <h2>Escolheste: Doar!</h2>
+            <p>O mundo inteiro agora pode apreciar estas memórias. </p>
+        `
+    }
+    else if (opcao === "Tentar denovo") {
+        recomecarJogo();
+        return; // Sai da função para não mostrar o texto abaixo
+    }
+
+    let btnVoltar = document.createElement("button");
+    btnVoltar.textContent = "Voltar ao Início";
+    btnVoltar.onclick = () => recomecarJogo();
+    container.appendChild(btnVoltar);
+}
+
+function recomecarJogo() {
+    puzzlesDisponiveis = [...imagens];
+    imagensFinal = [];
+    memoriasSalvas = 0;
+    puzzleCompleto = false;
+    puzzleFalhado = false;
+    //reset das variaveis todas
+
+    // mostrar denovo os elementos q tinha escondido
+    if (cnv) cnv.show();
+    document.getElementById("imagemReferencia").style.display = "block";
+    document.getElementById("cronometro").style.display = "block";
+    document.getElementById("memorias").style.display = "block";
+    document.getElementById("proximoPuzzle").style.display = "block";
+    document.getElementById("verMemorias").style.display = "block";
+
+
+    document.getElementById("telaFinal").style.display = "none";
+    document.getElementById("conteudoMemorias").innerHTML = "";
+
+    //voltar ao inicio da logica do p5
+    loop();
+    criarPuzzle();
+    criarPecas();
+    tempoInicio = millis();
 }
