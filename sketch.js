@@ -52,8 +52,6 @@ function setup() //configurar o jogo inicial
     botaoProximo = select("#proximoPuzzle")
     botaoProximo.mousePressed(proximoPuzzle)
 
-    select('#verMemorias').mousePressed(mostrarMemorias)
-
 }
 
 
@@ -290,8 +288,13 @@ function finalizarJogo() {
 
     //  mostrar o div do final 
     select('#telaFinal').show()
+    //  ligar botao ver aqui
+    let btnVer = select('#verMemorias')
+    btnVer.show()
+    btnVer.mousePressed(mostrarMemorias)
 
 }
+
 
 // galeria final de imagens e escolhas
 function mostrarMemorias() {
@@ -299,8 +302,9 @@ function mostrarMemorias() {
     container.html("") // limpar tudo 
 
     // esconder textos iniciais
-    select("#frase").hide()
-    select("#frase1").hide()
+    let mensagens = selectAll(".msg-fim")
+    mensagens[0].hide()
+    mensagens[1].hide()
     select('#verMemorias').hide()
 
     let titulo = createElement('h2', `Memórias salvas: ${memoriasSalvas} / ${imagensFinal.length}`)
@@ -395,6 +399,11 @@ function reiniciarJogo() {
     select("#proximoPuzzle").show()
     select('#telaFinal').hide()// Garante que o botão de ver memórias reaparece na próxima vez
     select('#conteudoMemorias').html("");// limpa a galeria de imagens anterior
+
+    mensagens = selectAll(".msg-fim")
+    mensagens[0].show()
+    mensagens[1].show()
+    select('#verMemorias').show()
 
     if (cnv) cnv.show()
     // criar novo puzzle do zero
